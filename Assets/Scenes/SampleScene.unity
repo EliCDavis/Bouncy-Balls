@@ -412,7 +412,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 1024
+  m_Text: 2048
 --- !u!222 &210692818
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1326,12 +1326,12 @@ MonoBehaviour:
   m_CaptionImage: {fileID: 0}
   m_ItemText: {fileID: 1541234812}
   m_ItemImage: {fileID: 0}
-  m_Value: 0
+  m_Value: 1
   m_Options:
     m_Options:
     - m_Text: Grid
       m_Image: {fileID: 0}
-    - m_Text: Latice
+    - m_Text: Spiral
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2048,6 +2048,9 @@ MonoBehaviour:
   enforceVelocityToggle: {fileID: 119141269}
   enforceFriction: {fileID: 1562749168}
   playPauseButton: {fileID: 905406807}
+  lineRendererMaterial: {fileID: 2100000, guid: 471ed4508df4cf24eae91b903fcbe96b,
+    type: 2}
+  guiFont: {fileID: 12800000, guid: 9185938bdc014d146805e97bdd6fcb8e, type: 3}
 --- !u!4 &1063829856
 Transform:
   m_ObjectHideFlags: 0
@@ -2432,7 +2435,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Boundary Side Width
+  m_Text: 'Boundary Size
+
+'
 --- !u!222 &1275164190
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3334,7 +3339,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 1024
+  m_Text: 2048
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -3518,7 +3523,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 80.0
+  m_Text: 115.0
 --- !u!222 &1802952182
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3886,7 +3891,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 80.0
+  m_Text: 115.0
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -3993,7 +3998,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Grid
+  m_Text: Spiral
 --- !u!222 &1965940054
 CanvasRenderer:
   m_ObjectHideFlags: 0

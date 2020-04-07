@@ -58,6 +58,12 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Button playPauseButton;
 
+    [SerializeField]
+    private Material lineRendererMaterial;
+
+    [SerializeField]
+    private Font guiFont;
+
     private int GetNumberOfParticlesFromInput()
     {
         return int.Parse(this.numberParticlesInput.text);
@@ -104,6 +110,9 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        DebugGUI.font = guiFont;
+        DebugGUI.Instance.drawInBuild = true;
+        DebugGUI.Instance.displayGraphs = true;
         Run();
     }
 
@@ -128,6 +137,8 @@ public class GameManager : MonoBehaviour
             Destroy(pointCollection);
         }
         startingVelocity = GetVelocityFromInput();
+        DebugGUI.SetGraphProperties("avgVelocity", "Average Velocity", 0, startingVelocity, 1, Color.black, true);
+
         if (GetDistributionTypeFromInput() == DistributionType.Grid)
         {
             pointCollection = BuildPoints(
@@ -154,20 +165,28 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+
         this.timeDisplay.text = (Time.time - timeStarted).ToString("0.00");
-        if (pointCollection != null && EnforceStartingVelocity())
+
+        var particles = pointCollection.transform.Find("Points").GetComponentsInChildren<Rigidbody2D>();
+        float totalVelocity = 0;
+        foreach (var p in particles)
         {
-            var particles = pointCollection.transform.Find("Points").GetComponentsInChildren<Rigidbody2D>();
-            foreach (var p in particles)
+            if (pointCollection != null && EnforceStartingVelocity())
             {
                 p.velocity = p.velocity.normalized * this.startingVelocity;
             }
+
+            totalVelocity += p.velocity.magnitude;
         }
+
+        DebugGUI.Graph("avgVelocity", totalVelocity / particles.Length);
+
+
 
         var currentFriction = enforceFriction.isOn;
         if (lastFrameEnforcedFriction != currentFriction)
         {
-            var particles = pointCollection.transform.Find("Points").GetComponentsInChildren<Rigidbody2D>();
             if (currentFriction)
             {
                 foreach (var p in particles)
@@ -187,6 +206,36 @@ public class GameManager : MonoBehaviour
         }
 
         lastFrameEnforcedFriction = currentFriction;
+    }
+
+    private GameObject BuildCircularContainer(Vector2 center, float radius)
+    {
+        GameObject container = new GameObject("Container");
+        container.transform.position = new Vector3(center.x, center.y, 0);
+
+        var edgeCollider = container.AddComponent<EdgeCollider2D>();
+        var lineRenderer = container.AddComponent<LineRenderer>();
+        lineRenderer.useWorldSpace = false;
+        lineRenderer.material = this.lineRendererMaterial;
+
+        int pointsOnCircle = 128;
+
+        var points = new Vector2[pointsOnCircle];
+        var points3 = new Vector3[pointsOnCircle];
+        var radAndAHalf = (radius + .5f);
+        for (int i = 0; i < pointsOnCircle - 1; i++)
+        {
+            var angle = (i / (float)pointsOnCircle) * Mathf.PI * 2;
+            points[i] = new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius);
+            points3[i] = new Vector3(Mathf.Cos(angle) * radAndAHalf, Mathf.Sin(angle) * radAndAHalf, 0);
+        }
+        points[pointsOnCircle - 1] = new Vector2(Mathf.Cos(0) * radius, Mathf.Sin(0) * radius);
+        points3[pointsOnCircle - 1] = new Vector3(Mathf.Cos(0) * radAndAHalf, Mathf.Sin(0) * radAndAHalf, 0);
+        lineRenderer.positionCount = pointsOnCircle;
+        lineRenderer.SetPositions(points3);
+        edgeCollider.points = points;
+
+        return container;
     }
 
     private GameObject BuildContainer(Vector2 bottomLeft, float sideSize)
@@ -237,16 +286,15 @@ public class GameManager : MonoBehaviour
         var pointResults = new GameObject("Points");
 
         int sqr = Mathf.CeilToInt(Mathf.Sqrt(numberOfPoints));
-        float spacing = cubeWallSize / (sqr + 1);
-        float halfSpacing = spacing / 2.0f;
+        float spacing = cubeWallSize / (sqr);
 
         for (int i = 0; i < numberOfPoints; i++)
         {
             GameObject point = Instantiate(particlePrefab);
             point.transform.name = string.Format("Point: {0}", i);
             point.transform.position = new Vector3(
-               ((i % sqr) * spacing) + halfSpacing,
-               (Mathf.Floor(i / sqr) * spacing) + halfSpacing,
+               ((i % sqr) * spacing),
+               (Mathf.Floor(i / sqr) * spacing),
                 0
             );
             point.transform.SetParent(pointResults.transform);
@@ -259,7 +307,7 @@ public class GameManager : MonoBehaviour
 
         pointResults.transform.SetParent(results.transform);
 
-        var container = BuildContainer(new Vector2(-halfSpacing, -halfSpacing), cubeWallSize);
+        var container = BuildContainer(Vector2.one * (-spacing / 2.0f), cubeWallSize);
         container.transform.SetParent(results.transform);
 
         camera.transform.position = new Vector3(container.transform.position.x, container.transform.position.y, -10);
@@ -319,7 +367,7 @@ public class GameManager : MonoBehaviour
 
         pointResults.transform.localScale *= pointSize / (diskRadius * 2f);
 
-        var container = BuildContainer(new Vector2(0, 0), cubeWallSize);
+        var container = BuildCircularContainer(Vector2.one * (cubeWallSize / 2.0f), cubeWallSize / 2.0f);
 
         camera.transform.position = new Vector3(container.transform.position.x, container.transform.position.y, -10);
         pointResults.transform.position = new Vector3(container.transform.position.x, container.transform.position.y, 0);
